@@ -2,133 +2,304 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solar Base-100 Clock</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pure Base-100 System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: #050505;
-            color: #00ffff;
-            font-family: 'Courier New', Courier, monospace;
+            background: radial-gradient(circle at 50% 50%, #151515 0%, #000000 100%);
+            font-family: 'Share Tech Mono', monospace;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
+            padding: 15px;
         }
 
-        .clock-container {
+        .clock-casing {
+            background: linear-gradient(135deg, #2b2b2b 0%, #0d0d0d 100%);
+            border-radius: 35px;
+            padding: 40px 25px 30px 25px;
+            box-shadow: 
+                0 40px 80px rgba(0, 0, 0, 0.95),
+                inset 0 4px 10px rgba(255, 255, 255, 0.12),
+                inset 0 -5px 20px rgba(0, 0, 0, 0.8);
+            border: 1px solid #3a3a3a;
+            width: 100%;
+            max-width: 540px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            min-height: 220px;
+        }
+
+        .snooze-btn {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 14px;
+            background: linear-gradient(to bottom, #222, #111);
+            border-radius: 8px 8px 0 0;
+            border: 1px solid #333;
+            border-bottom: none;
+            box-shadow: 
+                inset 0 2px 3px rgba(255,255,255,0.1),
+                0 -2px 10px rgba(0,0,0,0.5);
+        }
+
+        .screen {
+            background: radial-gradient(circle at 50% 50%, #0f0000 0%, #000000 100%);
+            border-radius: 18px;
+            padding: 30px 25px 20px 25px;
+            width: 100%;
+            box-shadow: 
+                inset 0 0 40px rgba(0, 0, 0, 1),
+                0 2px 2px rgba(255, 255, 255, 0.08);
+            border: 2px solid #050000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden; 
+        }
+
+        .screen::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right, 
+                rgba(255, 255, 255, 0.04) 0%, 
+                rgba(255, 255, 255, 0.01) 40%, 
+                rgba(255, 255, 255, 0) 50%
+            );
+            transform: rotate(30deg);
+            pointer-events: none; 
+        }
+
+        #statusText {
+            font-size: 1.1rem;
+            color: #ff4444;
+            text-shadow: 0 0 10px #ff0000;
+            animation: pulseGlow 1.5s infinite alternate;
             text-align: center;
+            letter-spacing: 2px;
+            line-height: 1.6;
+            z-index: 2;
         }
 
-        #status {
-            font-size: 1.2rem;
-            color: #aaaaaa;
-            margin-bottom: 20px;
-            animation: pulse 1.5s infinite alternate;
-        }
-
-        .fallback-container {
-            display: none;
-            margin-top: 15px;
-        }
-
-        .fallback-container input {
-            background: #111;
-            border: 1px solid #00ffff;
-            color: #00ffff;
-            padding: 8px 12px;
-            font-family: monospace;
-            font-size: 1rem;
-            text-align: center;
-            border-radius: 4px;
-            outline: none;
-        }
-
-        .fallback-container button {
-            background: #00ffff;
-            color: #050505;
-            border: none;
-            padding: 8px 15px;
-            font-family: monospace;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 4px;
-            margin-left: 5px;
-        }
-
-        .clock {
-            font-size: 8rem;
-            font-weight: bold;
-            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00aaff;
+        /* DIGITAL CLOCK STYLES */
+        .time-display {
             display: none; 
-            letter-spacing: 5px;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            z-index: 2; 
+        }
+
+        .main-digits {
+            font-size: 6rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            letter-spacing: 3px;
+            color: #fff2f2; 
+            text-shadow: 
+                0 0 10px #ff0000, 
+                0 0 20px #ff0000, 
+                0 0 40px #d60000, 
+                0 0 80px #aa0000;
         }
 
         .colon {
-            opacity: 0.8;
-            animation: blink 1s infinite alternate;
+            margin: 0 6px;
+            color: #ffcccc;
+            animation: blinker 1s infinite;
+            transform: translateY(-5px);
+            text-shadow: 0 0 15px #ff0000, 0 0 30px #ff0000;
         }
 
-        @keyframes pulse {
-            from { opacity: 0.5; }
-            to { opacity: 1; }
-        }
-
-        @keyframes blink {
-            from { opacity: 1; }
-            to { opacity: 0.2; }
-        }
-
-        .labels {
+        .side-panel {
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            margin-top: 10px;
-            padding: 0 20px;
-            font-size: 1rem;
-            color: #555555;
-            text-transform: uppercase;
+            margin-left: 20px;
+            height: 5rem;
+            padding-bottom: 2px;
+        }
+
+        .ampm-indicator {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ff6666;
+            text-align: right;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #aa0000;
+        }
+
+        .sec-digits {
+            font-size: 3rem;
+            line-height: 1;
+            color: #ffe6e6;
+            text-shadow: 
+                0 0 8px #ff0000, 
+                0 0 15px #d60000,
+                0 0 30px #aa0000;
+        }
+
+        /* METRIC CALENDAR STYLES */
+        .calendar-panel {
+            display: none;
+            width: 100%;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px dashed rgba(255, 0, 0, 0.2);
+            justify-content: space-between;
+            z-index: 2;
+        }
+
+        .cal-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 25%;
+        }
+
+        .cal-label {
+            font-size: 0.7rem;
+            color: #aa4444;
             letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .cal-val {
+            font-size: 1.5rem;
+            color: #ff8888;
+            text-shadow: 0 0 10px #ff0000;
+            letter-spacing: 2px;
+        }
+
+        /* STANDARD EARTH DATE STYLES */
+        .standard-date-panel {
+            display: none;
+            width: 100%;
+            margin-top: 15px;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .standard-date-text {
+            font-size: 0.8rem;
+            color: #662222; /* Dimmed so it doesn't distract from the metric clock */
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+        }
+
+        @keyframes pulseGlow {
+            from { opacity: 0.6; text-shadow: 0 0 5px #ff0000; }
+            to { opacity: 1; text-shadow: 0 0 15px #ff0000, 0 0 30px #ff0000; }
+        }
+
+        @keyframes blinker {
+            50% { opacity: 0.05; text-shadow: none; }
+        }
+
+        @media (max-width: 450px) {
+            .clock-casing { padding: 30px 15px 20px 15px; border-radius: 25px; }
+            .screen { padding: 25px 15px 15px 15px; }
+            .main-digits { font-size: 4.5rem; letter-spacing: 1px; }
+            .side-panel { height: 3.8rem; margin-left: 12px; }
+            .ampm-indicator { font-size: 1.1rem; }
+            .sec-digits { font-size: 2.3rem; }
+            .colon { margin: 0 2px; transform: translateY(-3px); }
+            
+            .calendar-panel { margin-top: 20px; padding-top: 15px; }
+            .cal-label { font-size: 0.6rem; letter-spacing: 1px; }
+            .cal-val { font-size: 1.2rem; }
+            .standard-date-text { font-size: 0.7rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="clock-container">
-        <div id="status">Awaiting GPS Authorization...</div>
-        
-        <div id="fallback" class="fallback-container">
-            <input type="text" id="cityInput" placeholder="Enter City (e.g. Bengaluru)">
-            <button onclick="handleCityFallback()">Sync</button>
-        </div>
-        
-        <div class="clock-wrapper">
-            <div class="clock" id="clock">
-                <span id="hours">00</span><span class="colon">:</span><span id="minutes">00</span><span class="colon">:</span><span id="seconds">00</span>
+    <div class="clock-casing">
+        <div class="snooze-btn"></div>
+        <div class="screen">
+            <div id="statusText">Pinging location...</div>
+            
+            <div id="timeDisplay" class="time-display">
+                <div class="main-digits">
+                    <span id="hours">00</span>
+                    <span class="colon">:</span>
+                    <span id="minutes">00</span>
+                </div>
+                <div class="side-panel">
+                    <div id="ampm" class="ampm-indicator">AM</div>
+                    <div class="sec-digits">
+                        <span id="seconds">00</span>
+                    </div>
+                </div>
             </div>
-            <div class="labels" id="labels" style="display: none;">
-                <span>Hours</span>
-                <span>Minutes</span>
-                <span>Seconds</span>
+
+            <div class="calendar-panel" id="calendarPanel">
+                <div class="cal-item">
+                    <span class="cal-label">YEAR</span>
+                    <span id="cYear" class="cal-val">0000</span>
+                </div>
+                <div class="cal-item">
+                    <span class="cal-label">MONTH</span>
+                    <span id="cMonth" class="cal-val">00</span>
+                </div>
+                <div class="cal-item">
+                    <span class="cal-label">WEEK</span>
+                    <span id="cWeek" class="cal-val">00</span>
+                </div>
+                <div class="cal-item">
+                    <span class="cal-label">DAY</span>
+                    <span id="cDay" class="cal-val">00</span>
+                </div>
             </div>
+
+            <div class="standard-date-panel" id="standardDatePanel">
+                <span id="standardDateText" class="standard-date-text">JAN 01, 2026</span>
+            </div>
+
         </div>
     </div>
 
     <script>
-        const statusEl = document.getElementById('status');
-        const fallbackEl = document.getElementById('fallback');
-        const cityInputEl = document.getElementById('cityInput');
-        const clockEl = document.getElementById('clock');
-        const labelsEl = document.getElementById('labels');
+        const statusText = document.getElementById('statusText');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const calendarPanel = document.getElementById('calendarPanel');
+        const standardDatePanel = document.getElementById('standardDatePanel');
+        
         const hEl = document.getElementById('hours');
         const mEl = document.getElementById('minutes');
         const sEl = document.getElementById('seconds');
+        const ampmEl = document.getElementById('ampm');
+
+        const cYearEl = document.getElementById('cYear');
+        const cMonthEl = document.getElementById('cMonth');
+        const cWeekEl = document.getElementById('cWeek');
+        const cDayEl = document.getElementById('cDay');
+        const standardDateTextEl = document.getElementById('standardDateText');
 
         let currentDayStart = 0;
         let customMsPerTick = 0;
@@ -140,50 +311,37 @@
             return `${yyyy}-${mm}-${dd}`;
         }
 
-        function init() {
+        function getDayOfYear(date) {
+            const start = new Date(date.getFullYear(), 0, 0);
+            const diff = date - start + (start.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000;
+            const oneDay = 1000 * 60 * 60 * 24;
+            return Math.floor(diff / oneDay);
+        }
+
+        function initGPS() {
             if (!navigator.geolocation) {
-                showError();
+                statusText.innerText = "ERROR: GPS Hardware Not Found";
                 return;
             }
-            statusEl.innerText = "Requesting location to sync with the sun...";
-            navigator.geolocation.getCurrentPosition(fetchSolarData, showError);
-        }
-
-        function showError(error) {
-            statusEl.innerText = "GPS Blocked. Enter your city to calculate sunrise:";
-            fallbackEl.style.display = "block";
-        }
-
-        async function handleCityFallback() {
-            const city = cityInputEl.value.trim();
-            if (!city) return;
             
-            statusEl.innerText = `Locating ${city}...`;
-            fallbackEl.style.display = "none";
-            
-            try {
-                // Keyless Geocoding API to find Lat/Lng from City Name
-                const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`);
-                const data = await res.json();
-                
-                if (data.results && data.results.length > 0) {
-                    const target = data.results[0];
-                    fetchSolarData({ coords: { latitude: target.latitude, longitude: target.longitude } });
-                } else {
-                    statusEl.innerText = "City not found. Try again:";
-                    fallbackEl.style.display = "block";
-                }
-            } catch (err) {
-                statusEl.innerText = "Network error tracking city. Try again:";
-                fallbackEl.style.display = "block";
-            }
+            navigator.geolocation.getCurrentPosition(
+                fetchSolarData, 
+                (error) => {
+                    let reason = "";
+                    if(error.code === 1) reason = "PERMISSION DENIED";
+                    else if(error.code === 2) reason = "POSITION UNAVAILABLE";
+                    else if(error.code === 3) reason = "TIMEOUT (Took too long)";
+                    
+                    statusText.innerHTML = `ERROR: ${reason}<br><br>Pull down your phone's top menu and ensure the main <strong>Location/GPS toggle</strong> is turned ON, then refresh.`;
+                }, 
+                { enableHighAccuracy: false, timeout: 30000, maximumAge: Infinity }
+            );
         }
 
         async function fetchSolarData(position) {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            statusEl.innerText = "Calculating planetary rotation...";
-            fallbackEl.style.display = "none";
+            statusText.innerText = "Location secured. Calculating sunrise...";
 
             const today = new Date();
             const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
@@ -218,24 +376,27 @@
                 }
 
                 const standardMsPerDay = nextDayStart - currentDayStart;
+                
                 customMsPerTick = standardMsPerDay / 1000000;
 
-                statusEl.style.display = "none";
-                clockEl.style.display = "block";
-                labelsEl.style.display = "flex";
+                statusText.style.display = "none";
+                timeDisplay.style.display = "flex";
+                calendarPanel.style.display = "flex"; 
+                standardDatePanel.style.display = "block"; // Reveals standard date
 
                 requestAnimationFrame(updateClock);
 
             } catch (err) {
-                statusEl.innerText = "Error fetching solar data. Please check your connection.";
+                statusText.innerText = "Network Error. Cannot reach solar server.";
                 console.error(err);
             }
         }
 
         function updateClock() {
-            const now = Date.now();
-            let elapsedMs = now - currentDayStart;
+            const nowObj = new Date();
+            const now = nowObj.getTime();
             
+            let elapsedMs = now - currentDayStart;
             if (elapsedMs < 0) elapsedMs = 0;
             
             let customTicks = Math.floor(elapsedMs / customMsPerTick);
@@ -243,16 +404,34 @@
 
             const s = customTicks % 100;
             const m = Math.floor(customTicks / 100) % 100;
-            const h = Math.floor(customTicks / 10000);
+            const h = Math.floor(customTicks / 10000); 
+
+            ampmEl.innerText = h < 50 ? "AM" : "PM";
 
             hEl.innerText = String(h).padStart(2, '0');
             mEl.innerText = String(m).padStart(2, '0');
             sEl.innerText = String(s).padStart(2, '0');
 
+            const dayOfYear = getDayOfYear(nowObj);
+            
+            const metricYear = nowObj.getFullYear();
+            const metricMonth = Math.ceil(dayOfYear / 100);
+            const metricDay = (dayOfYear - 1) % 100 + 1; 
+            const metricWeek = Math.ceil(metricDay / 10); 
+            
+            cYearEl.innerText = metricYear;
+            cMonthEl.innerText = String(metricMonth).padStart(2, '0');
+            cWeekEl.innerText = String(metricWeek).padStart(2, '0');
+            cDayEl.innerText = String(metricDay).padStart(2, '0');
+
+            // Format and display standard Earth Date
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            standardDateTextEl.innerText = nowObj.toLocaleDateString('en-US', options).toUpperCase();
+
             requestAnimationFrame(updateClock);
         }
 
-        init();
+        initGPS();
     </script>
 </body>
 </html>
