@@ -62,7 +62,7 @@
         .screen {
             background: radial-gradient(circle at 50% 50%, #0f0000 0%, #000000 100%);
             border-radius: 18px;
-            padding: 30px 25px 20px 25px;
+            padding: 25px 20px;
             width: 100%;
             box-shadow: 
                 inset 0 0 40px rgba(0, 0, 0, 1),
@@ -101,6 +101,23 @@
             text-align: center;
             letter-spacing: 2px;
             line-height: 1.6;
+            z-index: 2;
+        }
+
+        /* NEW: Phase of Day Badge */
+        .day-phase-badge {
+            display: none;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6666;
+            padding: 4px 15px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            text-shadow: 0 0 8px #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.1);
             z-index: 2;
         }
 
@@ -206,7 +223,7 @@
 
         .standard-date-text {
             font-size: 0.8rem;
-            color: #662222; /* Dimmed so it doesn't distract from the metric clock */
+            color: #662222; 
             letter-spacing: 3px;
             text-transform: uppercase;
             text-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
@@ -244,6 +261,9 @@
         <div class="screen">
             <div id="statusText">Pinging location...</div>
             
+            <!-- Phase of Day Badge -->
+            <div id="dayPhaseBadge" class="day-phase-badge">MORNING</div>
+
             <div id="timeDisplay" class="time-display">
                 <div class="main-digits">
                     <span id="hours">00</span>
@@ -258,6 +278,7 @@
                 </div>
             </div>
 
+            <!-- Metric Calendar HUD -->
             <div class="calendar-panel" id="calendarPanel">
                 <div class="cal-item">
                     <span class="cal-label">YEAR</span>
@@ -277,6 +298,7 @@
                 </div>
             </div>
 
+            <!-- Standard Earth Date Reference -->
             <div class="standard-date-panel" id="standardDatePanel">
                 <span id="standardDateText" class="standard-date-text">JAN 01, 2026</span>
             </div>
@@ -286,6 +308,7 @@
 
     <script>
         const statusText = document.getElementById('statusText');
+        const dayPhaseBadge = document.getElementById('dayPhaseBadge');
         const timeDisplay = document.getElementById('timeDisplay');
         const calendarPanel = document.getElementById('calendarPanel');
         const standardDatePanel = document.getElementById('standardDatePanel');
@@ -380,9 +403,10 @@
                 customMsPerTick = standardMsPerDay / 1000000;
 
                 statusText.style.display = "none";
+                dayPhaseBadge.style.display = "block"; // Reveals Phase Badge
                 timeDisplay.style.display = "flex";
                 calendarPanel.style.display = "flex"; 
-                standardDatePanel.style.display = "block"; // Reveals standard date
+                standardDatePanel.style.display = "block"; 
 
                 requestAnimationFrame(updateClock);
 
@@ -406,7 +430,19 @@
             const m = Math.floor(customTicks / 100) % 100;
             const h = Math.floor(customTicks / 10000); 
 
+            // AM / PM Logic
             ampmEl.innerText = h < 50 ? "AM" : "PM";
+
+            // 4-PHASE DAILY LIFE LOGIC
+            if (h >= 0 && h < 25) {
+                dayPhaseBadge.innerText = "MORNING";
+            } else if (h >= 25 && h < 50) {
+                dayPhaseBadge.innerText = "AFTERNOON";
+            } else if (h >= 50 && h < 75) {
+                dayPhaseBadge.innerText = "EVENING";
+            } else {
+                dayPhaseBadge.innerText = "NIGHT";
+            }
 
             hEl.innerText = String(h).padStart(2, '0');
             mEl.innerText = String(m).padStart(2, '0');
@@ -424,7 +460,6 @@
             cWeekEl.innerText = String(metricWeek).padStart(2, '0');
             cDayEl.innerText = String(metricDay).padStart(2, '0');
 
-            // Format and display standard Earth Date
             const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
             standardDateTextEl.innerText = nowObj.toLocaleDateString('en-US', options).toUpperCase();
 
