@@ -104,7 +104,6 @@
             z-index: 2;
         }
 
-        /* NEW: Phase of Day Badge */
         .day-phase-badge {
             display: none;
             background: rgba(255, 0, 0, 0.1);
@@ -137,11 +136,7 @@
             align-items: center;
             letter-spacing: 3px;
             color: #fff2f2; 
-            text-shadow: 
-                0 0 10px #ff0000, 
-                0 0 20px #ff0000, 
-                0 0 40px #d60000, 
-                0 0 80px #aa0000;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 40px #d60000, 0 0 80px #aa0000;
         }
 
         .colon {
@@ -174,18 +169,113 @@
             font-size: 3rem;
             line-height: 1;
             color: #ffe6e6;
-            text-shadow: 
-                0 0 8px #ff0000, 
-                0 0 15px #d60000,
-                0 0 30px #aa0000;
+            text-shadow: 0 0 8px #ff0000, 0 0 15px #d60000, 0 0 30px #aa0000;
+        }
+
+        /* NEW CLASSIC ANALOG CLOCK STYLES */
+        .analog-display {
+            display: none;
+            width: 220px;
+            height: 220px;
+            background: #fff;
+            border-radius: 50%;
+            border: 14px solid #111;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.2);
+            margin: 10px 0;
+            z-index: 2;
+        }
+
+        .clock-numbers-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .clock-number {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            font-family: 'Arial', sans-serif;
+            font-weight: 900;
+            font-size: 24px;
+            color: #111;
+            left: 50%;
+            top: 50%;
+        }
+
+        .clock-brand {
+            position: absolute;
+            top: 60%;
+            width: 100%;
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+            color: #111;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .clock-brand-logo {
+            width: 0; 
+            height: 0; 
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 8px solid #111;
+            margin: 0 auto 2px auto;
+        }
+
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        .hour-hand { width: 6px; height: 30%; background: #111; margin-left: -3px; }
+        .min-hand { width: 4px; height: 42%; background: #111; margin-left: -2px; }
+        
+        .sec-hand { 
+            width: 2px; 
+            height: 48%; 
+            background: #d00; 
+            margin-left: -1px; 
+        }
+        .sec-hand::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            height: 18px;
+            background: #d00;
+        }
+
+        .center-pin {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            background: #e0e0e0;
+            border: 2px solid #111;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 11;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
 
         /* METRIC CALENDAR STYLES */
         .calendar-panel {
             display: none;
             width: 100%;
-            margin-top: 25px;
-            padding-top: 20px;
+            margin-top: 15px;
+            padding-top: 15px;
             border-top: 2px dashed rgba(255, 0, 0, 0.2);
             justify-content: space-between;
             z-index: 2;
@@ -198,21 +288,10 @@
             width: 25%;
         }
 
-        .cal-label {
-            font-size: 0.7rem;
-            color: #aa4444;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-        }
+        .cal-label { font-size: 0.7rem; color: #aa4444; letter-spacing: 2px; margin-bottom: 5px; }
+        .cal-val { font-size: 1.5rem; color: #ff8888; text-shadow: 0 0 10px #ff0000; letter-spacing: 2px; }
 
-        .cal-val {
-            font-size: 1.5rem;
-            color: #ff8888;
-            text-shadow: 0 0 10px #ff0000;
-            letter-spacing: 2px;
-        }
-
-        /* STANDARD EARTH DATE STYLES */
+        /* STANDARD EARTH DATE & TOGGLE BTN */
         .standard-date-panel {
             display: none;
             width: 100%;
@@ -221,22 +300,27 @@
             z-index: 2;
         }
 
-        .standard-date-text {
+        .standard-date-text { font-size: 0.8rem; color: #662222; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 5px rgba(255, 0, 0, 0.3); }
+
+        .toggle-btn {
+            margin-top: 15px;
+            background: transparent;
+            color: #aa4444;
+            border: 1px solid #aa4444;
+            padding: 6px 15px;
+            border-radius: 8px;
+            font-family: 'Share Tech Mono', monospace;
             font-size: 0.8rem;
-            color: #662222; 
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            text-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+            cursor: pointer;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            z-index: 2;
         }
 
-        @keyframes pulseGlow {
-            from { opacity: 0.6; text-shadow: 0 0 5px #ff0000; }
-            to { opacity: 1; text-shadow: 0 0 15px #ff0000, 0 0 30px #ff0000; }
-        }
+        .toggle-btn:hover { background: rgba(255, 0, 0, 0.1); color: #ff6666; border-color: #ff6666; }
 
-        @keyframes blinker {
-            50% { opacity: 0.05; text-shadow: none; }
-        }
+        @keyframes pulseGlow { from { opacity: 0.6; text-shadow: 0 0 5px #ff0000; } to { opacity: 1; text-shadow: 0 0 15px #ff0000, 0 0 30px #ff0000; } }
+        @keyframes blinker { 50% { opacity: 0.05; text-shadow: none; } }
 
         @media (max-width: 450px) {
             .clock-casing { padding: 30px 15px 20px 15px; border-radius: 25px; }
@@ -246,8 +330,7 @@
             .ampm-indicator { font-size: 1.1rem; }
             .sec-digits { font-size: 2.3rem; }
             .colon { margin: 0 2px; transform: translateY(-3px); }
-            
-            .calendar-panel { margin-top: 20px; padding-top: 15px; }
+            .calendar-panel { margin-top: 15px; padding-top: 10px; }
             .cal-label { font-size: 0.6rem; letter-spacing: 1px; }
             .cal-val { font-size: 1.2rem; }
             .standard-date-text { font-size: 0.7rem; }
@@ -261,9 +344,9 @@
         <div class="screen">
             <div id="statusText">Pinging location...</div>
             
-            <!-- Phase of Day Badge -->
             <div id="dayPhaseBadge" class="day-phase-badge">MORNING</div>
 
+            <!-- Digital Display -->
             <div id="timeDisplay" class="time-display">
                 <div class="main-digits">
                     <span id="hours">00</span>
@@ -278,29 +361,29 @@
                 </div>
             </div>
 
-            <!-- Metric Calendar HUD -->
-            <div class="calendar-panel" id="calendarPanel">
-                <div class="cal-item">
-                    <span class="cal-label">YEAR</span>
-                    <span id="cYear" class="cal-val">0000</span>
+            <!-- New Analog Display -->
+            <div id="analogDisplay" class="analog-display">
+                <div class="clock-numbers-container" id="clockNumbers"></div>
+                <div class="clock-brand">
+                    <div class="clock-brand-logo"></div>
+                    Deepak719639
                 </div>
-                <div class="cal-item">
-                    <span class="cal-label">MONTH</span>
-                    <span id="cMonth" class="cal-val">00</span>
-                </div>
-                <div class="cal-item">
-                    <span class="cal-label">WEEK</span>
-                    <span id="cWeek" class="cal-val">00</span>
-                </div>
-                <div class="cal-item">
-                    <span class="cal-label">DAY</span>
-                    <span id="cDay" class="cal-val">00</span>
-                </div>
+                <div id="analogHourHand" class="hand hour-hand"></div>
+                <div id="analogMinHand" class="hand min-hand"></div>
+                <div id="analogSecHand" class="hand sec-hand"></div>
+                <div class="center-pin"></div>
             </div>
 
-            <!-- Standard Earth Date Reference -->
+            <div class="calendar-panel" id="calendarPanel">
+                <div class="cal-item"><span class="cal-label">YEAR</span><span id="cYear" class="cal-val">0000</span></div>
+                <div class="cal-item"><span class="cal-label">MONTH</span><span id="cMonth" class="cal-val">00</span></div>
+                <div class="cal-item"><span class="cal-label">WEEK</span><span id="cWeek" class="cal-val">00</span></div>
+                <div class="cal-item"><span class="cal-label">DAY</span><span id="cDay" class="cal-val">00</span></div>
+            </div>
+
             <div class="standard-date-panel" id="standardDatePanel">
-                <span id="standardDateText" class="standard-date-text">JAN 01, 2026</span>
+                <div id="standardDateText" class="standard-date-text">JAN 01, 2026</div>
+                <button id="toggleBtn" class="toggle-btn" onclick="toggleView()" style="display:none;">SWITCH TO ANALOG</button>
             </div>
 
         </div>
@@ -309,15 +392,25 @@
     <script>
         const statusText = document.getElementById('statusText');
         const dayPhaseBadge = document.getElementById('dayPhaseBadge');
-        const timeDisplay = document.getElementById('timeDisplay');
-        const calendarPanel = document.getElementById('calendarPanel');
-        const standardDatePanel = document.getElementById('standardDatePanel');
         
+        // Displays
+        const timeDisplay = document.getElementById('timeDisplay');
+        const analogDisplay = document.getElementById('analogDisplay');
+        const toggleBtn = document.getElementById('toggleBtn');
+        
+        // Digital Elements
         const hEl = document.getElementById('hours');
         const mEl = document.getElementById('minutes');
         const sEl = document.getElementById('seconds');
         const ampmEl = document.getElementById('ampm');
 
+        // Analog Elements
+        const clockNumbers = document.getElementById('clockNumbers');
+        const analogHourHand = document.getElementById('analogHourHand');
+        const analogMinHand = document.getElementById('analogMinHand');
+        const analogSecHand = document.getElementById('analogSecHand');
+
+        // Calendar Elements
         const cYearEl = document.getElementById('cYear');
         const cMonthEl = document.getElementById('cMonth');
         const cWeekEl = document.getElementById('cWeek');
@@ -326,6 +419,54 @@
 
         let currentDayStart = 0;
         let customMsPerTick = 0;
+        let isDigital = true;
+
+        // BUILD THE ANALOG CLOCK FACE DYNAMICALLY
+        function buildAnalogFace() {
+            // Create 100 tick marks
+            for(let i=0; i<100; i++) {
+                let tick = document.createElement('div');
+                tick.style.position = 'absolute';
+                tick.style.width = i % 10 === 0 ? '3px' : '1px';
+                tick.style.height = '100%';
+                tick.style.left = 'calc(50% - ' + (i%10===0?1.5:0.5) + 'px)';
+                
+                let mark = document.createElement('div');
+                mark.style.width = '100%';
+                mark.style.height = i % 10 === 0 ? '12px' : '6px';
+                mark.style.background = '#111';
+                
+                tick.appendChild(mark);
+                tick.style.transform = `rotate(${i * 3.6}deg)`;
+                clockNumbers.appendChild(tick);
+            }
+
+            // Create exactly 10 Base-100 Numbers
+            for(let i=1; i<=10; i++) {
+                let num = document.createElement('div');
+                num.className = 'clock-number';
+                num.innerText = i;
+                let angle = i * 36 * (Math.PI / 180);
+                let radius = 70; // keeps numbers inside the ticks
+                let x = Math.sin(angle) * radius;
+                let y = -Math.cos(angle) * radius;
+                num.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+                clockNumbers.appendChild(num);
+            }
+        }
+
+        function toggleView() {
+            isDigital = !isDigital;
+            if (isDigital) {
+                timeDisplay.style.display = 'flex';
+                analogDisplay.style.display = 'none';
+                toggleBtn.innerText = 'SWITCH TO ANALOG';
+            } else {
+                timeDisplay.style.display = 'none';
+                analogDisplay.style.display = 'block';
+                toggleBtn.innerText = 'SWITCH TO DIGITAL';
+            }
+        }
 
         function getYYYYMMDD(dateObj) {
             const yyyy = dateObj.getFullYear();
@@ -342,6 +483,7 @@
         }
 
         function initGPS() {
+            buildAnalogFace();
             if (!navigator.geolocation) {
                 statusText.innerText = "ERROR: GPS Hardware Not Found";
                 return;
@@ -403,10 +545,11 @@
                 customMsPerTick = standardMsPerDay / 1000000;
 
                 statusText.style.display = "none";
-                dayPhaseBadge.style.display = "block"; // Reveals Phase Badge
+                dayPhaseBadge.style.display = "block";
                 timeDisplay.style.display = "flex";
                 calendarPanel.style.display = "flex"; 
                 standardDatePanel.style.display = "block"; 
+                toggleBtn.style.display = "inline-block";
 
                 requestAnimationFrame(updateClock);
 
@@ -444,12 +587,23 @@
                 dayPhaseBadge.innerText = "NIGHT";
             }
 
+            // DIGITAL UPDATE
             hEl.innerText = String(h).padStart(2, '0');
             mEl.innerText = String(m).padStart(2, '0');
             sEl.innerText = String(s).padStart(2, '0');
 
+            // ANALOG HAND ROTATION MATH (Pure Base-100)
+            const analogH = h % 50; 
+            const hDeg = (analogH / 50) * 360 + (m / 100) * (360 / 50);
+            const mDeg = (m / 100) * 360 + (s / 100) * (360 / 100);
+            const sDeg = (s / 100) * 360;
+
+            analogHourHand.style.transform = `rotate(${hDeg}deg)`;
+            analogMinHand.style.transform = `rotate(${mDeg}deg)`;
+            analogSecHand.style.transform = `rotate(${sDeg}deg)`;
+
+            // CALENDAR UPDATE
             const dayOfYear = getDayOfYear(nowObj);
-            
             const metricYear = nowObj.getFullYear();
             const metricMonth = Math.ceil(dayOfYear / 100);
             const metricDay = (dayOfYear - 1) % 100 + 1; 
