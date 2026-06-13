@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Base-100 Clock</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #050505;
+            color: #00ffff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .clock-container {
+            text-align: center;
+        }
+
+        #status {
+            font-size: 1.2rem;
+            color: #aaaaaa;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        .fallback-container {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .fallback-container input {
+            background: #111;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            padding: 8px 12px;
+            font-family: monospace;
+            font-size: 1rem;
+            text-align: center;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .fallback-container button {
+            background: #00ffff;
+            color: #050505;
+            border: none;
+            padding: 8px 15px;
+            font-family: monospace;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-left: 5px;
+        }
+
+        .clock {
+            font-size: 8rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00aaff;
+            display: none; 
+            letter-spacing: 5px;
+        }
+
+        .colon {
+            opacity: 0.8;
+            animation: blink 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+
+        @keyframes blink {
+            from { opacity: 1; }
+            to { opacity: 0.2; }
+        }
+
+        .labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding: 0 20px;
+            font-size: 1rem;
+            color: #555555;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="clock-container">
+        <div id="status">Awaiting GPS Authorization...</div>
+        
+        <div id="fallback" class="fallback-container">
+            <input type="text" id="cityInput" placeholder="Enter City (e.g. Bengaluru)">
+            <button onclick="handleCityFallback()">Sync</button>
+        </div>
+        
+        <div class="clock-wrapper">
+            <div class="clock" id="clock">
+                <span id="hours">00</span><span class="colon">:</span><span id="minutes">00</span><span class="colon">:</span><span id="seconds">00</span>
+            </div>
+            <div class="labels" id="labels" style="display: none;">
+                <span>Hours</span>
+                <span>Minutes</span>
+                <span>Seconds</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const statusEl = document.getElementById('status');
+        const fallbackEl = document.getElementById('fallback');
+        const cityInputEl = document.getElementById('cityInput');
+        const clockEl = document.getElementById('clock');
+        const labelsEl = document.getElementById('labels');
+        const hEl = document.getElementById('hours');
+        const mEl = document.getElementById('minutes');
+        const sEl = document.getElementById('seconds');
+
+        let currentDayStart = 0;
+        let customMsPerTick = 0;
+
+        function getYYYYMMDD(dateObj) {
+            const yyyy = dateObj.getFullYear();
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const dd = String(dateObj.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function init() {
+            if (!navigator.geolocation) {
+                showError();
+                return;
+            }
+            statusEl.innerText = "Requesting location to sync with the sun...";
+            navigator.geolocation.getCurrentPosition(fetchSolarData, showError);
+        }
+
+        function showError(error) {
+            statusEl.innerText = "GPS Blocked. Enter your city to calculate sunrise:";
+            fallbackEl.style.display = "block";
+        }
+
+        async function handleCityFallback() {
+            const city = cityInputEl.value.trim();
+            if (!city) return;
+            
+            statusEl.innerText = `Locating ${city}...`;
+            fallbackEl.style.display = "none";
+            
+            try {
+                // Keyless Geocoding API to find Lat/Lng from City Name
+                const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`);
+                const data = await res.json();
+                
+                if (data.results && data.results.length > 0) {
+                    const target = data.results[0];
+                    fetchSolarData({ coords: { latitude: target.latitude, longitude: target.longitude } });
+                } else {
+                    statusEl.innerText = "City not found. Try again:";
+                    fallbackEl.style.display = "block";
+                }
+            } catch (err) {
+                statusEl.innerText = "Network error tracking city. Try again:";
+                fallbackEl.style.display = "block";
+            }
+        }
+
+        async function fetchSolarData(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            statusEl.innerText = "Calculating planetary rotation...";
+            fallbackEl.style.display = "none";
+
+            const today = new Date();
+            const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+            const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+
+            try {
+                const urls = [
+                    `https://api.sunrisesunset.io/json?lat=${lat}&lng=${lng}&date=${getYYYYMMDD(yesterday)}&formatted=0`,
+                    `https://api.sunrisesunset.io/json?lat=${lat}&lng=${lng}&date=today&formatted=0`,
+                    `https://api.sunrisesunset.io/json?lat=${lat}&lng=${lng}&date=tomorrow&formatted=0`
+                ];
+
+                const responses = await Promise.all(urls.map(url => fetch(url)));
+                const data = await Promise.all(responses.map(res => res.json()));
+
+                const srYesterday = new Date(data[0].results.sunrise).getTime();
+                const srToday = new Date(data[1].results.sunrise).getTime();
+                const srTomorrow = new Date(data[2].results.sunrise).getTime();
+
+                const now = Date.now();
+                let nextDayStart;
+
+                if (now >= srToday && now < srTomorrow) {
+                    currentDayStart = srToday;
+                    nextDayStart = srTomorrow;
+                } else if (now < srToday) {
+                    currentDayStart = srYesterday;
+                    nextDayStart = srToday;
+                } else {
+                    currentDayStart = srToday;
+                    nextDayStart = srTomorrow;
+                }
+
+                const standardMsPerDay = nextDayStart - currentDayStart;
+                customMsPerTick = standardMsPerDay / 1000000;
+
+                statusEl.style.display = "none";
+                clockEl.style.display = "block";
+                labelsEl.style.display = "flex";
+
+                requestAnimationFrame(updateClock);
+
+            } catch (err) {
+                statusEl.innerText = "Error fetching solar data. Please check your connection.";
+                console.error(err);
+            }
+        }
+
+        function updateClock() {
+            const now = Date.now();
+            let elapsedMs = now - currentDayStart;
+            
+            if (elapsedMs < 0) elapsedMs = 0;
+            
+            let customTicks = Math.floor(elapsedMs / customMsPerTick);
+            customTicks = customTicks % 1000000; 
+
+            const s = customTicks % 100;
+            const m = Math.floor(customTicks / 100) % 100;
+            const h = Math.floor(customTicks / 10000);
+
+            hEl.innerText = String(h).padStart(2, '0');
+            mEl.innerText = String(m).padStart(2, '0');
+            sEl.innerText = String(s).padStart(2, '0');
+
+            requestAnimationFrame(updateClock);
+        }
+
+        init();
+    </script>
+</body>
+</html>
